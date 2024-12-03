@@ -1,0 +1,22 @@
+.map {
+    width: 100%;
+    height: 100vh;
+  }
+  
+  .layer-control,
+  .draw-control {
+    button {
+      display: block;
+      margin-bottom: 5px;
+      padding: 10px;
+      border: none;
+      background-color: #3498db;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      &:hover {
+        background-color: #2980b9;
+      }
+    }
+  }
+  

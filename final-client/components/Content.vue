@@ -1,26 +1,29 @@
 <template>
-    <div class="content">
-      <h1>{{ pageTitle }}</h1>
-      <slot />
+  <div class="content-wrapper">
+    <div class="container-fluid py-4">
+      <NuxtPage />
     </div>
-  </template>
-  
-  <script setup>
-  defineProps({
-    pageTitle: {
-      type: String,
-      required: true,
-    },
-  });
-  </script>
-  
-  <style scoped>
-  .content {
-    padding: 20px;
+  </div>
+</template>
+
+<script setup>
+// Potential for adding global content-related logic
+const contentClasses = ref(['content-default'])
+
+// Optional: Dynamically manage content classes
+const updateContentClasses = (newClasses) => {
+  contentClasses.value = newClasses
+}
+</script>
+
+<style scoped>
+.content-wrapper {
+top: 0;
+left: 0;
+}
+@media (max-width: 768px) {
+  .content-wrapper {
+    margin-left: 0;
   }
-  
-  h1 {
-    font-size: 24px;
-    margin-bottom: 20px;
-  }
-  </style>
+}
+</style>

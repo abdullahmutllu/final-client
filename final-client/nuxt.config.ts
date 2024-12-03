@@ -1,6 +1,18 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2024-11-01',
-  devtools: { enabled: true },
-  modules: ['usebootstrap']
+  ssr: false,
+  build: {
+    transpile: ['ol']
+  },
+  css: [
+    'bootstrap/dist/css/bootstrap.css',
+    'bootstrap-vue-next/dist/bootstrap-vue-next.css',
+  ],
+  modules: [
+
+    '@bootstrap-vue-next/nuxt'
+  ],
+ 
+  bootstrapVueNext: {
+  
+  }
 })
