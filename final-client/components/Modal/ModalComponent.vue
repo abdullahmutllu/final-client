@@ -12,14 +12,14 @@
   
   <script setup>  
   const isVisible = ref(false)
-  const title = ref('Modal Başlığı')
+  const title = ref('Modal Basligi')
   
   const close = () => {
     isVisible.value = false
   }
   
   const save = () => {
-    console.log('Kaydedildi!')
+    console.log('Kaydedildi')
     isVisible.value = false
   }
   
@@ -34,6 +34,6 @@
   </script>
   
   <style scoped>
-  /* Modal'ın stilini burada özelleştirebilirsiniz */
+
   </style>
   
