@@ -1,4 +1,5 @@
 <template>
+    <MapContainer />
  <div class="test">
     <p>test</p>
  </div>

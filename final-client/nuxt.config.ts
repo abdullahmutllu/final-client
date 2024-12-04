@@ -8,10 +8,10 @@ export default defineNuxtConfig({
     'bootstrap-vue-next/dist/bootstrap-vue-next.css',
   ],
   modules: [
-
+'@pinia/nuxt',
     '@bootstrap-vue-next/nuxt'
   ],
- 
+
   bootstrapVueNext: {
   
   }

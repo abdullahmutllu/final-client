@@ -7,10 +7,7 @@
 </template>
 
 <script setup>
-// Potential for adding global content-related logic
 const contentClasses = ref(['content-default'])
-
-// Optional: Dynamically manage content classes
 const updateContentClasses = (newClasses) => {
   contentClasses.value = newClasses
 }

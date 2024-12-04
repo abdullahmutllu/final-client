@@ -9,19 +9,7 @@
           <ChevronRight v-else />
         </button>
   
-        <div class="navbar-search-container">
-          <form class="d-flex">
-            <input 
-              class="form-control me-2" 
-              type="search" 
-              placeholder="Search" 
-              aria-label="Search"
-            />
-            <button class="btn btn-search" type="submit">
-              Search
-            </button>
-          </form>
-        </div>
+      
   
         <div class="navbar-actions">
           <BDropdown variant="link">
@@ -53,7 +41,7 @@
   
   <style scoped>
   .navbar {
-    background-color: #dfdffb; /* Soft deep purple-blue */
+    background-color: #ebebf3; 
     height: 50px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 1050;
@@ -61,7 +49,7 @@
   }
   
   .btn-sidebar-toggle {
-    background: rgba(255,255,255,0.2);
+    background: rgba(211, 0, 0, 0.2);
     border: none;
     color: #f4f4f8;
     transition: background-color 0.3s ease;
@@ -71,26 +59,6 @@
     background: rgba(255,255,255,0.3);
   }
   
-  .btn-search {
-    background-color: #6a5acd; /* Soft slate blue */
-    color: white;
-    border: none;
-    transition: background-color 0.3s ease;
-  }
-  
-  .btn-search:hover {
-    background-color: #5a4abd;
-  }
-  
-  .navbar-search-container .form-control {
-    background-color: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
-    color: #f4f4f8;
-  }
-  
-  .navbar-search-container .form-control::placeholder {
-    color: rgba(244,244,248,0.7);
-  }
   
   .user-avatar {
     width: 40px;
