@@ -14,13 +14,19 @@
         @select="featureSelected"
         :condition="selectCondition"
         :filter="selectInteractionFilter"
-        :layers="[PointLayer]"
+        :layers="[PointLayer, PathLayer]"
       >
       </ol-interaction-select>
 
+      <!-- Noktalar için katman -->
       <PointLayer 
         :points="mapStore.points" 
         :selected-city="selectedCity"
+      />
+
+      <!-- Path katmanı -->
+      <PathLayer 
+        :paths="pathStore.paths" 
       />
     </ol-map>
 
@@ -58,13 +64,16 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useMapStore } from '~/stores/mapStore';
+import { usePathStore } from '~/stores/pathStore';  // pathStore importu
 import PointLayer from './MapLayers/PointLayer.vue';
+import PathLayer from './MapLayers/PathLayer.vue';  // PathLayer importu
 import CityFilterModal from '~/components/Modal/CityFilterModal.vue';
 import FeatureDetailsModal from '~/components/Modal/FeatureDetailModal.vue';
 import { BButton } from 'bootstrap-vue-next';
 import { singleClick } from 'ol/events/condition'
 
 const mapStore = useMapStore();
+const pathStore = usePathStore();  // pathStore kullanımı
 const zoom = ref(6);
 const center = computed(() => mapStore.mapCenter || [39, 35]); 
 const selectedCity = ref('');
@@ -89,8 +98,11 @@ const featureSelected = (event) => {
 onMounted(async () => {
   try {
     await mapStore.fetchMapData();
+    await pathStore.fetchPathData();  // pathStore'dan veri çekme
+    console.log('Pathhhhh Verileri:', pathStore.paths); 
+  
   } catch (error) {
-    console.error('Map data fetch error:', error);
+    console.error('Veri çekme hatası:', error);
   }
 });
 
@@ -111,3 +123,4 @@ const applyFilter = (city) => {
   console.log(`Filtre uygulandı: ${city}`);
 };
 </script>
+
