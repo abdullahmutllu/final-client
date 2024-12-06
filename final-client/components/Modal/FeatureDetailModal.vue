@@ -1,7 +1,7 @@
 <template>
     <b-modal 
       :visible="isVisible" 
-      title="Çizim Detayları" 
+      title="Şarj İstasyonu" 
       size="sz" 
       class="custom-modal"
       @hidden="$emit('update:isVisible', false)"

@@ -7,12 +7,7 @@
 </template>
 
 <script setup>
-const contentClasses = ref(['content-default'])
-const updateContentClasses = (newClasses) => {
-  contentClasses.value = newClasses
-}
 </script>
-
 <style scoped>
 .content-wrapper {
 top: 0;

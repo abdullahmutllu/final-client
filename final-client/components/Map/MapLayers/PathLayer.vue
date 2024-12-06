@@ -44,7 +44,7 @@
   const center = ref([3627878.54, 4891371.59]); // Varsayılan merkez koordinatı
   const projection = ref("EPSG:3857"); // Web Mercator projeksiyon
   const zoom = ref(6); // Varsayılan zoom seviyesi
-  const strokeWidth = ref(3);
+  const strokeWidth = ref(2);
   const strokeColor = ref("blue");
   
   const isModalVisible = ref(false);

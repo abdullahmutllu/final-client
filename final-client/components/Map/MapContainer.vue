@@ -1,5 +1,6 @@
 <template>
   <div>
+       <!-- Harita İşlemleri -->
     <ol-map
       :loadTilesWhileAnimating="true"
       :loadTilesWhileInteracting="true"
@@ -9,7 +10,7 @@
       <ol-tile-layer>
         <ol-source-osm />
       </ol-tile-layer>
-
+      
       <ol-interaction-select
         @select="featureSelected"
         :condition="selectCondition"
@@ -17,17 +18,26 @@
         :layers="[PointLayer, PathLayer]"
       >
       </ol-interaction-select>
+      <template v-if="layerVisibility.parkingAreas">
+        <ParkingAreaLayer 
+          :parking-areas="parkingAreaStore.parkingAreas" 
+        />
+      </template>
 
-      <!-- Noktalar için katman -->
-      <PointLayer 
-        :points="mapStore.points" 
-        :selected-city="selectedCity"
-      />
 
-      <!-- Path katmanı -->
-      <PathLayer 
-        :paths="pathStore.paths" 
-      />
+      <template v-if="layerVisibility.points">
+        <PointLayer 
+          :points="mapStore.points" 
+          :selected-city="selectedCity"
+        />
+      </template>
+
+      <template v-if="layerVisibility.paths">
+        <PathLayer 
+          :paths="pathStore.paths" 
+        />
+      </template>
+
     </ol-map>
 
     <div v-if="mapStore.isLoading" class="text-center mt-2">
@@ -38,13 +48,30 @@
       Hata: {{ mapStore.error }}
     </div>
 
-    <b-button 
-      variant="primary" 
-      @click="openCityFilterModal" 
-      class="mt-2"
-    >
-      Şehre Göre Filtrele
-    </b-button>
+    <!-- Katman Açma Kapatma İşlemleri -->
+    <div class="mt-2 space-x-2">
+      <b-button 
+        :variant="layerVisibility.parkingAreas ? 'primary' : 'secondary'"
+        @click="toggleLayerVisibility('parkingAreas')"
+      >
+        Park Alanları {{ layerVisibility.parkingAreas ? 'Açık' : 'Kapalı' }}
+      </b-button>
+      
+      <b-button 
+        :variant="layerVisibility.points ? 'primary' : 'secondary'"
+        @click="toggleLayerVisibility('points')"
+      >
+        Şarj İstasyonları {{ layerVisibility.points ? 'Açık' : 'Kapalı' }}
+      </b-button>
+      
+      <b-button 
+        :variant="layerVisibility.paths ? 'primary' : 'secondary'"
+        @click="toggleLayerVisibility('paths')"
+      >
+        Yollar {{ layerVisibility.paths ? 'Açık' : 'Kapalı' }}
+      </b-button>
+    </div>
+    
     
     <CityFilterModal 
       :is-visible="isModalVisible" 
@@ -62,24 +89,45 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+// Store
 import { useMapStore } from '~/stores/mapStore';
-import { usePathStore } from '~/stores/pathStore';  // pathStore importu
+import { useParkingAreaStore } from '~/stores/parkingAreaStore';
+import { usePathStore } from '~/stores/pathStore'; 
+// Layer
+import ParkingAreaLayer from './MapLayers/ParkingAreaLayer.vue'; 
 import PointLayer from './MapLayers/PointLayer.vue';
-import PathLayer from './MapLayers/PathLayer.vue';  // PathLayer importu
+import PathLayer from './MapLayers/PathLayer.vue';
+// Modal
 import CityFilterModal from '~/components/Modal/CityFilterModal.vue';
 import FeatureDetailsModal from '~/components/Modal/FeatureDetailModal.vue';
+// Boostrap-Vue-next
 import { BButton } from 'bootstrap-vue-next';
-import { singleClick } from 'ol/events/condition'
+//vue3-openlayers
+import { singleClick } from 'ol/events/condition';
 
+//
 const mapStore = useMapStore();
-const pathStore = usePathStore();  // pathStore kullanımı
+const pathStore = usePathStore(); 
+const parkingAreaStore = useParkingAreaStore();
+//
 const zoom = ref(6);
-const center = computed(() => mapStore.mapCenter || [39, 35]); 
+const center = computed(() => mapStore.mapCenter || [39, 35]);
+const selectedFeature = ref(null);
 const selectedCity = ref('');
+//
 const isModalVisible = ref(false);
 const isFeatureModalVisible = ref(false);
-const selectedFeature = ref(null);
+
+// Layer Control
+const layerVisibility = reactive({
+  parkingAreas: false,
+  points: false,
+  paths: false
+});
+
+const toggleLayerVisibility = (layerName) => {
+  layerVisibility[layerName] = !layerVisibility[layerName];
+};
 
 const selectCondition = singleClick;
 const selectInteractionFilter = (feature) => {
@@ -88,7 +136,6 @@ const selectInteractionFilter = (feature) => {
 };
 
 const featureSelected = (event) => {
-  console.log('Seçim olayı:', event);
   if (event.selected && event.selected.length > 0) {
     selectedFeature.value = event.selected[0].getProperties();
     isFeatureModalVisible.value = true;
@@ -98,29 +145,18 @@ const featureSelected = (event) => {
 onMounted(async () => {
   try {
     await mapStore.fetchMapData();
-    await pathStore.fetchPathData();  // pathStore'dan veri çekme
-    console.log('Pathhhhh Verileri:', pathStore.paths); 
-  
+    await pathStore.fetchPathData();
+    await parkingAreaStore.fetchParkingAreaData();
   } catch (error) {
     console.error('Veri çekme hatası:', error);
   }
 });
 
-const openCityFilterModal = () => {
-  isModalVisible.value = true;
-};
 
-const closeCityFilterModal = () => {
-  isModalVisible.value = false;
-};
+
 
 const closeFeatureModal = () => {
   isFeatureModalVisible.value = false;
 };
 
-const applyFilter = (city) => {
-  selectedCity.value = city;
-  console.log(`Filtre uygulandı: ${city}`);
-};
 </script>
-

@@ -8,9 +8,6 @@
           <ChevronLeft v-if="isSidebarOpen" />
           <ChevronRight v-else />
         </button>
-  
-      
-  
         <div class="navbar-actions">
           <BDropdown variant="link">
             <template #button-content>
