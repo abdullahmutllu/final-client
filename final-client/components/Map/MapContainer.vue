@@ -15,7 +15,7 @@
         @select="featureSelected"
         :condition="selectCondition"
         :filter="selectInteractionFilter"
-        :layers="[PointLayer, PathLayer]"
+        :layers="[ChargingStationLayer, PathLayer]"
       >
       </ol-interaction-select>
       <template v-if="layerVisibility.parkingAreas">
@@ -25,8 +25,8 @@
       </template>
 
 
-      <template v-if="layerVisibility.points">
-        <PointLayer 
+      <template v-if="layerVisibility.ChargingStation">
+        <ChargingStationLayer 
           :points="mapStore.points" 
           :selected-city="selectedCity"
         />
@@ -58,10 +58,10 @@
       </b-button>
       
       <b-button 
-        :variant="layerVisibility.points ? 'primary' : 'secondary'"
-        @click="toggleLayerVisibility('points')"
+        :variant="layerVisibility.ChargingStation ? 'primary' : 'secondary'"
+        @click="toggleLayerVisibility('ChargingStation')"
       >
-        Şarj İstasyonları {{ layerVisibility.points ? 'Açık' : 'Kapalı' }}
+        Şarj İstasyonları {{ layerVisibility.ChargingStation ? 'Açık' : 'Kapalı' }}
       </b-button>
       
       <b-button 
@@ -95,7 +95,7 @@ import { useParkingAreaStore } from '~/stores/parkingAreaStore';
 import { usePathStore } from '~/stores/pathStore'; 
 // Layer
 import ParkingAreaLayer from './MapLayers/ParkingAreaLayer.vue'; 
-import PointLayer from './MapLayers/PointLayer.vue';
+import ChargingStationLayer from './MapLayers/ChargingStationLayer.vue';
 import PathLayer from './MapLayers/PathLayer.vue';
 // Modal
 import CityFilterModal from '~/components/Modal/CityFilterModal.vue';

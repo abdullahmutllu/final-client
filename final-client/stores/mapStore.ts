@@ -39,7 +39,7 @@ export const useMapStore = defineStore('mapStore', {
     points: [] as ChargingStation[],
     isLoading: false,
     error: null as string | null,
-    cacheTimestamp: 0 // Önbellek için timestamp
+    cacheTimestamp: 0 
   }),
 
   getters: {
@@ -55,9 +55,9 @@ export const useMapStore = defineStore('mapStore', {
       return transform([35.2433, 38.9637], 'EPSG:4326', 'EPSG:3857')
     },
 
-    // Önbellek süresi: 5 dakika
+   
     isCacheValid(): boolean {
-      const cacheDuration = 5 * 60 * 1000 // 5 dakika
+      const cacheDuration = 5 * 60 * 1000 
       return Date.now() - this.cacheTimestamp < cacheDuration
     }
   },
@@ -88,7 +88,7 @@ export const useMapStore = defineStore('mapStore', {
     },
 
     async fetchMapData(forceUpdate = false) {
-      // Önbellek geçerli ise veriyi tekrar çekmeye gerek yok
+      
       if (!forceUpdate && this.isCacheValid) {
         return
       }
@@ -139,8 +139,6 @@ export const useMapStore = defineStore('mapStore', {
             voltage: item.voltage,
             coordinates: this.parseGeometry(item.geometry) // Geometriyi dönüştürme
           })).filter(point => point.coordinates !== null)
-
-          // Veriyi başarılı şekilde aldıktan sonra önbellek timestamp'ini güncelle
           this.cacheTimestamp = Date.now()
         } else {
           throw new Error("Invalid response format")
