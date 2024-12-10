@@ -1,40 +1,54 @@
 <template>
   <div>
-    <calculate-charging-station/>
-    <div v-if="isLoading">Veri Yükleniyor...</div>
+    <calculate-charging-station />
 
-    <div v-if="error">{{ error }}</div>
+    <!-- Yüklenme animasyonu -->
+    <div v-if="isLoading" class="text-center my-5">
+      <BSpinner label="Veri Yükleniyor..."></BSpinner>
+    </div>
 
-    <ul v-if="!isLoading && !error && nearestChargingStations.length > 0">
-      <li v-for="(chargingStation, index) in nearestChargingStations" :key="index">
-        <strong>{{ chargingStation.city }}</strong>
-        <ul>
-          <li><strong>İsim:</strong> {{ chargingStation.name || 'Bilinmeyen' }}</li>
-          <li><strong>Kapasite:</strong> {{ chargingStation.capacity || 'Bilinmeyen' }}</li>
-          <li><strong>Şarj Türü:</strong> {{ chargingStation.charge || 'Bilinmeyen' }}</li>
-          <li>
-            <strong>Koordinatlar:</strong> 
-            {{ chargingStation.coordinates[1].toFixed(6) }}, {{ chargingStation.coordinates[0].toFixed(6) }} <!-- enlem, boylam formatı -->
-          </li>
-          <!-- Yol Tarifi Al Butonu -->
-          <li>
-            <a 
-              :href="generateDirectionsLink(userLocation.latitude, userLocation.longitude, chargingStation.coordinates[1], chargingStation.coordinates[0])"
-              target="_blank"
-              class="btn btn-primary"
-            >
-              Yol Tarifi Al
-            </a>
-          </li>
-        </ul>
-      </li>
-    </ul>
+    <!-- Hata Mesajı -->
+    <div v-if="error" class="alert alert-danger" role="alert">
+      {{ error }}
+    </div>
 
-    <div v-if="!isLoading && !error && nearestChargingStations.length === 0">
+    <!-- Şarj İstasyonları Listesi -->
+    <div v-if="!isLoading && !error && nearestChargingStations.length > 0">
+      <BRow>
+        <BCol v-for="(chargingStation, index) in nearestChargingStations" :key="index" cols="12" md="6" lg="4" class="mb-4">
+          <BCard>
+            <BCardHeader class="bg-primary text-white">
+              {{ chargingStation.city }}
+            </BCardHeader>
+            <BCardBody>
+              <p><strong>İsim:</strong> {{ chargingStation.name || 'Bilinmeyen' }}</p>
+              <p><strong>Kapasite:</strong> {{ chargingStation.capacity || 'Bilinmeyen' }}</p>
+              <p><strong>Şarj Türü:</strong> {{ chargingStation.charge || 'Bilinmeyen' }}</p>
+              <p><strong>Koordinatlar:</strong> {{ chargingStation.coordinates[1].toFixed(6) }}, {{ chargingStation.coordinates[0].toFixed(6) }}</p>
+            </BCardBody>
+            <BCardFooter>
+              <!-- Yol Tarifi Butonu -->
+              <BButton 
+                :href="generateDirectionsLink(userLocation.latitude, userLocation.longitude, chargingStation.coordinates[1], chargingStation.coordinates[0])" 
+                target="_blank" 
+                variant="success" 
+                block
+              >
+                Yol Tarifi Al
+              </BButton>
+            </BCardFooter>
+          </BCard>
+        </BCol>
+      </BRow>
+    </div>
+
+    <!-- Boş Liste Durumu -->
+    <div v-if="!isLoading && !error && nearestChargingStations.length === 0" class="alert alert-warning">
       Şarj istasyonu bulunamadı.
     </div>
   </div>
 </template>
+
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from 'vue';
