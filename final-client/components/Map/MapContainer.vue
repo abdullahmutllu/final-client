@@ -9,7 +9,13 @@
       <ol-tile-layer>
         <ol-source-osm />
       </ol-tile-layer>
-      
+      <LocationLayer 
+      :mapView="$refs.mapView"
+    />
+    <!-- <NearbyChargingStations 
+      v-if="userLocation" 
+      :userLocation="userLocation" 
+    /> -->
       <ol-interaction-select
         @select="featureSelected"
         :condition="selectCondition"
@@ -135,6 +141,8 @@ import { useParkingAreaStore } from '~/stores/parkingAreaStore'
 import { usePathStore } from '~/stores/pathStore'
 import { useFilterStore  } from '~/stores/filterStore'
 import ParkingAreaLayer from './MapLayers/ParkingAreaLayer.vue'
+import NearbyChargingStations from './MapLayers/NearbyChargingStations.vue'
+import LocationLayer from './MapLayers/LocationLayer.vue'
 import ChargingStationLayer from './MapLayers/ChargingStationLayer.vue'
 import PathLayer from './MapLayers/PathLayer.vue'
 import CityFilterModal from '~/components/Modal/CityFilterModal.vue'
@@ -144,7 +152,7 @@ import { singleClick } from 'ol/events/condition'
 import Feature from 'ol/Feature'
 import { useTrafficLightsStore } from '../../stores/trafficLights'
 import TrafficLightsLayer from './MapLayers/TrafficLightsLayer.vue'
-
+import { fromLonLat } from 'ol/proj'
 // Stores
 const mapStore = useMapStore()
 const pathStore = usePathStore()
