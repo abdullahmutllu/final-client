@@ -35,8 +35,7 @@ const isSidebarOpen = ref(true)
 
 const menuItems = [
   { to: '/', label: 'Home', icon: Home },
-  { to: '/profile', label: 'Profile', icon: User },
-  { to: '/settings', label: 'Settings', icon: Settings }
+  { to: '/chargingstation', label: 'Charging Station', icon: User},
 ]
 
 const toggleSidebar = () => {
