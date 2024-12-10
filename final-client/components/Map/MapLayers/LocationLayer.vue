@@ -1,9 +1,8 @@
 <template>
   <ol-vector-layer :zIndex="2">
     <ol-source-vector>
-      <!-- Konum verisini yalnızca mevcutsa ekleyelim -->
+      <!-- Koordinatlar varsa, göstermek için -->
       <ol-feature v-if="position.length > 0" ref="positionFeature">
-        <!-- Koordinatları doğrudan position'dan alıyoruz -->
         <ol-geom-point :coordinates="position"></ol-geom-point>
         <ol-style>
           <ol-style-icon :src="hereIcon" :scale="0.1"></ol-style-icon>
@@ -43,22 +42,22 @@ onMounted(() => {
 
         console.log('Dönüştürülmüş Koordinatlar:', coordinate);
 
-        // Konum verisini güncelliyoruz
+        // Koordinatları güncelliyoruz
         position.value = coordinate;
 
         // Harita merkezini yeni koordinatlarla ayarlıyoruz
         if (props.mapView) {
-          props.mapView.setCenter(coordinate);
-          props.mapView.setZoom(16); // Harita yakınlaştırması
+          props.mapView.setCenter(coordinate); // Harita merkezini kullanıcı konumuna ayarla
+          props.mapView.setZoom(16); // Yakınlaştırma düzeyini 16 yapıyoruz
         }
       },
       (error) => {
         console.error("Konum hatası:", error);
       },
       {
-        enableHighAccuracy: true, // Daha hassas konum
-        timeout: 5000,
-        maximumAge: 0
+        enableHighAccuracy: true, // Yüksek doğrulukla konum al
+        timeout: 10000, // Zaman aşımını biraz arttırıyoruz
+        maximumAge: 0 // Her seferinde yeni konum alalım
       }
     );
   } else {
