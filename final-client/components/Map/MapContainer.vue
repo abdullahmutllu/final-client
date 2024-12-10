@@ -10,6 +10,7 @@
         <ol-source-osm />
       </ol-tile-layer>
       <LocationLayer 
+      @positionCoordinate="handlePositionUpdate"
       :mapView="$refs.mapView"
     />
     <!-- <NearbyChargingStations 
@@ -164,7 +165,9 @@ const zoom = ref(6)
 const center = computed(() => mapStore.mapCenter || [39, 35])
 const selectedFeature = ref(null)
 const selectedCity = ref('')
-
+const handlePositionUpdate = (value)=>{
+  console.log("test",value)
+}
 const isModalVisible = ref(false)
 const isFeatureModalVisible = ref(false)
 

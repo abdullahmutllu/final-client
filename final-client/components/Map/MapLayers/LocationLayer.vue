@@ -14,16 +14,12 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { fromLonLat } from 'ol/proj';
+import { useLocationStore } from '@/stores/location'; // Pinia store'u import et
+import { fromLonLat } from 'ol/proj'; // Koordinat dönüşümü için OpenLayers fonksiyonu
 import hereIcon from '@/assets/parkalan.jpg';
 
-const props = defineProps({
-  mapView: {
-    type: Object,
-    required: true
-  }
-});
-
+// Store'u kullan
+const locationStore = useLocationStore();
 const position = ref([]); // Konum verisini burada tutuyoruz
 
 onMounted(() => {
@@ -39,8 +35,10 @@ onMounted(() => {
         // OpenLayers için koordinat dönüşümü
         // `fromLonLat` EPSG:4326 -> EPSG:3857 dönüşümü yapar
         const coordinate = fromLonLat([longitude, latitude]);
-
         console.log('Dönüştürülmüş Koordinatlar:', coordinate);
+
+        // Pinia store'a konum bilgisini yükle
+        locationStore.setLocation(coordinate);
 
         // Koordinatları güncelliyoruz
         position.value = coordinate;
