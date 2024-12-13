@@ -8,18 +8,19 @@
           :properties="{
             id: area.id,
             name: area.Name || 'Bilinmiyor',
-            description: `Otopark: ${area.AbbOtopark || 'Bilinmiyor'}, Yer: ${area.City || 'Bilinmiyor'}, Ücretli: ${area.Charge || 'Hayır'}`,
-            ...area
+            description: `Otopark: ${area.AbbOtopark || 'Bilinmiyor'}, Yer: ${
+              area.City || 'Bilinmiyor'
+            }, Ücretli: ${area.Charge || 'Hayır'}`,
+            ...area,
           }"
           @click="featureSelected"
         >
-          <ol-geom-polygon
-            v-if="area.coordinates && area.coordinates.length > 0"
-            :coordinates="area.coordinates"
-          />
+          <!-- Polygon geometrisi çıkarıldı, sadece point kullanılıyor -->
+          <ol-geom-point :coordinates="area.coordinates" />
           <ol-style>
-            <ol-style-stroke color="red" :width="10"></ol-style-stroke>
+            <ol-style-stroke color="red" :width="3"></ol-style-stroke>
             <ol-style-fill color="rgba(255,255,255,0.1)"></ol-style-fill>
+            <ol-style-icon :src="markerIcon" :scale="0.1"></ol-style-icon>
           </ol-style>
         </ol-feature>
       </ol-source-vector>
@@ -28,44 +29,37 @@
 </template>
 
 <script setup lang="ts">
+import markerIcon from '@/assets/parkalan.jpg'
 const props = defineProps({
   parkingAreas: {
     type: Array,
-    default: () => []
-  }
-});
+    default: () => [],
+  },
+})
 
+// Koordinatları normalize eden fonksiyon
 const normalizeCoordinates = (coords: any) => {
-  const coordinatesArray = Array.isArray(coords)
-    ? Array.from(coords).map(coord =>
-        Array.isArray(coord)
-          ? [Number(coord[0]), Number(coord[1])]
-          : coord
-      )
-    : [];
-  return coordinatesArray;
-};
+  if (Array.isArray(coords) && coords.length === 2) {
+    // Koordinatları (lon, lat) olarak normalize et
+    return [Number(coords[0]), Number(coords[1])]
+  }
+  return []
+}
 
-// Geçerli park alanları
+// Geçerli otopark alanlarını filtreleme
 const validParkingAreas = computed(() => {
   return props.parkingAreas
-    .map(area => {
-      const normalizedCoordinates = normalizeCoordinates(area.coordinates);
+    .map((area) => {
+      const normalizedCoordinates = normalizeCoordinates(area.coordinates)
       return {
         id: area.id,
-        coordinates: [normalizedCoordinates], 
+        coordinates: normalizedCoordinates,
         Name: area.Name,
         City: area.City,
         AbbOtopark: area.AbbOtopark,
-        Charge: area.Charge
-      };
+        Charge: area.Charge,
+      }
     })
-    .filter(area =>
-      area.coordinates &&
-      area.coordinates.length > 0 &&
-      area.coordinates[0].length > 2
-    );
-});
-
-
+    .filter((area) => area.coordinates && area.coordinates.length === 2) // Sadece geçerli point koordinatları olanları filtrele
+})
 </script>

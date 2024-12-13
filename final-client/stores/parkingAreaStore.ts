@@ -43,7 +43,7 @@ export const useParkingAreaStore = defineStore('parkingAreaStore', {
     parkingAreas: [] as ParkingAreaInfo[],
     isLoading: false,
     error: null as string | null,
-    cacheTimestamp: 0 // Önbellek için timestamp
+    cacheTimestamp: 0, // Önbellek için timestamp
   }),
 
   getters: {
@@ -58,11 +58,13 @@ export const useParkingAreaStore = defineStore('parkingAreaStore', {
     isCacheValid(): boolean {
       const cacheDuration = 5 * 60 * 1000 // 5 dakika
       return Date.now() - this.cacheTimestamp < cacheDuration
-    }
+    },
   },
 
   actions: {
-    transformCoordinates(coordinates: [number, number]): [number, number] | null {
+    transformCoordinates(
+      coordinates: [number, number]
+    ): [number, number] | null {
       if (!coordinates) return null
       try {
         return transform(coordinates, 'EPSG:4326', 'EPSG:3857')
@@ -72,28 +74,17 @@ export const useParkingAreaStore = defineStore('parkingAreaStore', {
       }
     },
 
-    parseGeometry(geometryString: string): [number, number][] | null {
-      try {
-        const matches = geometryString.match(/POLYGON \(\(([^)]+)\)\)/)
-        if (matches && matches.length === 2) {
-          const coords: [number, number][] = matches[1]
-            .split(',')
-            .map(coord => {
-              const [x, y] = coord.trim().split(' ').map(parseFloat)
-              return [x, y]
-            })
-            .filter(coord => !isNaN(coord[0]) && !isNaN(coord[1])) // Invalid koordinatları filtrele
+    parseGeometry(geometryString: string): [number, number] | null {
+      const matches = geometryString.match(/POINT \(([^\s]+)\s([^\s]+)\)/)
 
-          // Koordinatları EPSG:3857'ye dönüştür
-          const transformedCoords = coords
-            .map(this.transformCoordinates)
-            .filter(coord => coord !== null)
-
-          return transformedCoords.length > 0 ? transformedCoords : null
-        }
-      } catch (error) {
-        console.error('Geometri çözümleme hatası:', error)
+      if (matches && matches.length === 3) {
+        const coords: [number, number] = [
+          parseFloat(matches[1]),
+          parseFloat(matches[2]),
+        ]
+        return this.transformCoordinates(coords)
       }
+
       return null
     },
 
@@ -110,14 +101,17 @@ export const useParkingAreaStore = defineStore('parkingAreaStore', {
       console.log('Parking area verileri yükleniyor...')
 
       try {
-        const response = await $fetch('https://localhost:7129/api/ParkingArea', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          retry: 0,
-          ignoreResponseError: true
-        })
+        const response = await $fetch(
+          'https://localhost:7129/api/ParkingArea',
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            retry: 0,
+            ignoreResponseError: true,
+          }
+        )
 
         // API yanıtını kontrol et
         console.log('API Yanıtı:', response)
@@ -126,44 +120,49 @@ export const useParkingAreaStore = defineStore('parkingAreaStore', {
           console.log('API yanıtındaki otopark verileri:', response.$values)
 
           // response.$values üzerinde gezinip geometriyi çözerek parkingAreas dizisine ekliyoruz
-          this.parkingAreas = response.$values.map(item => ({
-            ogc_fid: item.ogc_fid,
-            id: item.id,
-            AbbOtopark: item.AbbOtopark,
-            City: item.City,
-            Country: item.Country,
-            District: item.District,
-            HouseNumber: item.HouseNumber,
-            Neighbourhood: item.Neighbourhood,
-            Postcode: item.Postcode,
-            Province: item.Province,
-            Street: item.Street,
-            AltName: item.AltName,
-            Brand: item.Brand,
-            Charge: item.Charge,
-            CheckDate: item.CheckDate,
-            CheckDateFee: item.CheckDateFee,
-            ContactPhone: item.ContactPhone,
-            Description: item.Description,
-            DisabledVehicle: item.DisabledVehicle,
-            DrinkingWater: item.DrinkingWater,
-            Duration: item.Duration,
-            Email: item.Email,
-            Fee: item.Fee,
-            Location: item.Location,
-            Mobile: item.Mobile,
-            Motorcar: item.Motorcar,
-            Name: item.Name,
-            OpeningHours: item.OpeningHours,
-            Operator: item.Operator,
-            Parking: item.Parking,
-            Phone: item.Phone,
-            Place: item.Place,
-            Power: item.Power,
-            coordinates: this.parseGeometry(item.wkb_geometry) // Geometriyi çöz
-          })).filter(parking => parking.coordinates !== null)
+          this.parkingAreas = response.$values
+            .map((item) => ({
+              ogc_fid: item.ogc_fid,
+              id: item.id,
+              AbbOtopark: item.AbbOtopark,
+              City: item.City,
+              Country: item.Country,
+              District: item.District,
+              HouseNumber: item.HouseNumber,
+              Neighbourhood: item.Neighbourhood,
+              Postcode: item.Postcode,
+              Province: item.Province,
+              Street: item.Street,
+              AltName: item.AltName,
+              Brand: item.Brand,
+              Charge: item.Charge,
+              CheckDate: item.CheckDate,
+              CheckDateFee: item.CheckDateFee,
+              ContactPhone: item.ContactPhone,
+              Description: item.Description,
+              DisabledVehicle: item.DisabledVehicle,
+              DrinkingWater: item.DrinkingWater,
+              Duration: item.Duration,
+              Email: item.Email,
+              Fee: item.Fee,
+              Location: item.Location,
+              Mobile: item.Mobile,
+              Motorcar: item.Motorcar,
+              Name: item.Name,
+              OpeningHours: item.OpeningHours,
+              Operator: item.Operator,
+              Parking: item.Parking,
+              Phone: item.Phone,
+              Place: item.Place,
+              Power: item.Power,
+              coordinates: this.parseGeometry(item.wkb_geometry), // Geometriyi çöz
+            }))
+            .filter((parking) => parking.coordinates !== null)
 
-          console.log('Çekilen ve işlenen parkingAreas verileri:', this.parkingAreas)
+          console.log(
+            'Çekilen ve işlenen parkingAreas verileri:',
+            this.parkingAreas
+          )
 
           this.cacheTimestamp = Date.now()
           this.isLoading = false
@@ -175,6 +174,6 @@ export const useParkingAreaStore = defineStore('parkingAreaStore', {
         this.isLoading = false
         console.error('Veri yüklenirken hata:', error)
       }
-    }
-  }
+    },
+  },
 })

@@ -40,7 +40,7 @@
       >
         <ol-geom-point :coordinates="point.coordinates" />
         <ol-style>
-        <ol-style-stroke color="red" :width="2"></ol-style-stroke>
+        <ol-style-stroke color="red" :width="3"></ol-style-stroke>
         <ol-style-fill color="rgba(255,255,255,0.1)"></ol-style-fill>
         <ol-style-icon :src="markerIcon" :scale="0.1"></ol-style-icon>
       </ol-style>

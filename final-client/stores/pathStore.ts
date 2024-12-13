@@ -17,6 +17,7 @@ interface PathInfo {
   destination?: string | null
   altName?: string | null
   coordinates: [number, number][] | null
+  Centroid?: string
 }
 
 export const usePathStore = defineStore('pathStore', {
@@ -24,7 +25,7 @@ export const usePathStore = defineStore('pathStore', {
     paths: [] as PathInfo[],
     isLoading: false,
     error: null as string | null,
-    cacheTimestamp: 0 // Önbellek için timestamp
+    cacheTimestamp: 0, // Önbellek için timestamp
   }),
 
   getters: {
@@ -33,7 +34,9 @@ export const usePathStore = defineStore('pathStore', {
     },
 
     uniqueHighways(): string[] {
-      return [...new Set(this.paths.map(path => path.highway).filter(Boolean))]
+      return [
+        ...new Set(this.paths.map((path) => path.highway).filter(Boolean)),
+      ]
     },
 
     mapCenter(): [number, number] {
@@ -43,11 +46,13 @@ export const usePathStore = defineStore('pathStore', {
     isCacheValid(): boolean {
       const cacheDuration = 5 * 60 * 1000 // 5 dakika
       return Date.now() - this.cacheTimestamp < cacheDuration
-    }
+    },
   },
 
   actions: {
-    transformCoordinates(coordinates: [number, number]): [number, number] | null {
+    transformCoordinates(
+      coordinates: [number, number]
+    ): [number, number] | null {
       if (!coordinates) return null
       try {
         return transform(coordinates, 'EPSG:4326', 'EPSG:3857')
@@ -64,13 +69,15 @@ export const usePathStore = defineStore('pathStore', {
         // Koordinatları ayır ve her birini array içine al
         const coords: [number, number][] = matches[1]
           .split(',')
-          .map(coord => {
+          .map((coord) => {
             const [x, y] = coord.trim().split(' ').map(parseFloat)
             return [x, y]
           })
-        
+
         // Koordinatları EPSG:3857'ye dönüştür
-        return coords.map(this.transformCoordinates).filter(coord => coord !== null)
+        return coords
+          .map(this.transformCoordinates)
+          .filter((coord) => coord !== null)
       }
       return null
     },
@@ -91,32 +98,35 @@ export const usePathStore = defineStore('pathStore', {
         const response = await $fetch('https://localhost:7129/api/Path', {
           method: 'GET',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           },
           retry: 0,
-          ignoreResponseError: true
+          ignoreResponseError: true,
         })
 
         console.log('API Yanıtı:', response) // API yanıtını kontrol edin
 
         if (response && response.$values) {
           console.log('API yanıtındaki path verileri:', response.$values) // Yanıtın içeriğini kontrol edin
-          this.paths = response.$values.map(item => ({
-            id: item.id,
-            toll: item.toll,
-            surface: item.surface,
-            ref: item.ref,
-            oneway: item.oneway,
-            name: item.name,
-            maxSpeed: item.maxSpeed,
-            lanes: item.lanes,
-            intRef: item.intRef,
-            highway: item.highway,
-            description: item.description,
-            destination: item.destination,
-            altName: item.altName,
-            coordinates: this.parseGeometry(item.wkbGeometry) // Geometriyi dönüştürme
-          })).filter(path => path.coordinates !== null)
+          this.paths = response.$values
+            .map((item) => ({
+              id: item.id,
+              toll: item.toll,
+              surface: item.surface,
+              ref: item.ref,
+              oneway: item.oneway,
+              name: item.name,
+              maxSpeed: item.maxSpeed,
+              lanes: item.lanes,
+              intRef: item.intRef,
+              highway: item.highway,
+              description: item.description,
+              destination: item.destination,
+              altName: item.altName,
+              Centroid: item.Centroid,
+              coordinates: this.parseGeometry(item.wkbGeometry), // Geometriyi dönüştürme
+            }))
+            .filter((path) => path.coordinates !== null)
 
           console.log('Çekilen ve işlenen path verileri:', this.paths) // İşlenmiş veriyi kontrol edin
 
@@ -131,6 +141,6 @@ export const usePathStore = defineStore('pathStore', {
         this.isLoading = false
         console.error('Path verileri yüklenirken hata:', error)
       }
-    }
-  }
+    },
+  },
 })

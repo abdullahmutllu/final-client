@@ -13,53 +13,53 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useLocationStore } from '@/stores/location'; // Pinia store'u import et
-import { fromLonLat } from 'ol/proj'; // Koordinat dönüşümü için OpenLayers fonksiyonu
-import hereIcon from '@/assets/parkalan.jpg';
+import { ref, onMounted } from 'vue'
+import { useLocationStore } from '@/stores/location' // Pinia store'u import et
+import { fromLonLat } from 'ol/proj' // Koordinat dönüşümü için OpenLayers fonksiyonu
+import hereIcon from '@/assets/pin.png'
 
 // Store'u kullan
-const locationStore = useLocationStore();
-const position = ref([]); // Konum verisini burada tutuyoruz
+const locationStore = useLocationStore()
+const position = ref([]) // Konum verisini burada tutuyoruz
 
 onMounted(() => {
-  if ("geolocation" in navigator) {
+  if ('geolocation' in navigator) {
     navigator.geolocation.getCurrentPosition(
       (geoPosition) => {
         // Ham koordinatlar (longitude, latitude) formatında alınır
-        const longitude = geoPosition.coords.longitude;
-        const latitude = geoPosition.coords.latitude;
+        const longitude = geoPosition.coords.longitude
+        const latitude = geoPosition.coords.latitude
 
-        console.log('Ham Koordinatlar:', [longitude, latitude]);
+        console.log('Ham Koordinatlar:', [longitude, latitude])
 
         // OpenLayers için koordinat dönüşümü
         // `fromLonLat` EPSG:4326 -> EPSG:3857 dönüşümü yapar
-        const coordinate = fromLonLat([longitude, latitude]);
-        console.log('Dönüştürülmüş Koordinatlar:', coordinate);
+        const coordinate = fromLonLat([longitude, latitude])
+        console.log('Dönüştürülmüş Koordinatlar:', coordinate)
 
         // Pinia store'a konum bilgisini yükle
-        locationStore.setLocation(coordinate);
+        locationStore.setLocation(coordinate)
 
         // Koordinatları güncelliyoruz
-        position.value = coordinate;
+        position.value = coordinate
 
         // Harita merkezini yeni koordinatlarla ayarlıyoruz
         if (props.mapView) {
-          props.mapView.setCenter(coordinate); // Harita merkezini kullanıcı konumuna ayarla
-          props.mapView.setZoom(16); // Yakınlaştırma düzeyini 16 yapıyoruz
+          props.mapView.setCenter(coordinate) // Harita merkezini kullanıcı konumuna ayarla
+          props.mapView.setZoom(16) // Yakınlaştırma düzeyini 16 yapıyoruz
         }
       },
       (error) => {
-        console.error("Konum hatası:", error);
+        console.error('Konum hatası:', error)
       },
       {
         enableHighAccuracy: true, // Yüksek doğrulukla konum al
         timeout: 10000, // Zaman aşımını biraz arttırıyoruz
-        maximumAge: 0 // Her seferinde yeni konum alalım
+        maximumAge: 0, // Her seferinde yeni konum alalım
       }
-    );
+    )
   } else {
-    console.error("Geolocation desteği mevcut değil.");
+    console.error('Geolocation desteği mevcut değil.')
   }
-});
+})
 </script>
