@@ -122,7 +122,7 @@
         Filtrele
       </b-button>
       <b-button variant="primary" @click="takeScreenshotAsPdf">
-        Ekran Görüntüsü Al
+        Rapor Al
       </b-button>
     </div>
 
@@ -148,6 +148,7 @@ import { useMapStore } from '~/stores/mapStore'
 import { useParkingAreaStore } from '~/stores/parkingAreaStore'
 import { usePathStore } from '~/stores/pathStore'
 import { useFilterStore } from '~/stores/filterStore'
+import { useAnalysisStore } from '~/stores/analysisStore'
 import ParkingAreaLayer from './MapLayers/ParkingAreaLayer.vue'
 import LocationLayer from './MapLayers/LocationLayer.vue'
 import PetrolStationLayer from './MapLayers/PetrolStationLayer.vue'
@@ -164,6 +165,7 @@ import { fromLonLat } from 'ol/proj'
 import { usePetrolStationStore } from '../../stores/petrolStationStore'
 import PointLayer from './MapLayers/PointLayer.vue'
 import html2pdf from 'html2pdf.js'
+
 // Stores
 const mapStore = useMapStore()
 const pathStore = usePathStore()
@@ -171,6 +173,13 @@ const parkingAreaStore = useParkingAreaStore()
 const filterStore = useFilterStore()
 const trafficLightsStore = useTrafficLightsStore()
 const petrolStationStore = usePetrolStationStore()
+const analysisStore = useAnalysisStore()
+analysisStore.recommendedLocations.forEach((location) => {
+  console.log('test', location)
+  console.log('Location Latitude:', location.location.latitude)
+  console.log('Location Longitude:', location.location.longitude)
+})
+
 // Map state
 const zoom = ref(6)
 const center = computed(() => mapStore.mapCenter || [39, 35])
@@ -181,45 +190,55 @@ const handlePositionUpdate = (value) => {
 }
 const takeScreenshotAsPdf = async () => {
   try {
-    const mapContainer = document.querySelector('#map-container') // Harita container'ını seç
+    const mapContainer = document.querySelector('#map-container')
 
-    // PDF konfigürasyonu
     const opt = {
-      margin: 0.5, // Sayfa kenar boşluğu
-      filename: 'map_screenshot.pdf', // PDF dosyasının adı
-      image: { type: 'jpeg', quality: 1.0 }, // Görüntü kalitesi
-      html2canvas: { dpi: 300, letterRendering: true, scale: 2 }, // HTML2Canvas konfigürasyonu
-      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }, // jsPDF konfigürasyonu
+      margin: 0.5,
+      filename: 'rapor.pdf',
+      image: { type: 'jpeg', quality: 1.0 },
+      html2canvas: { dpi: 300, letterRendering: true, scale: 3 },
+      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
     }
 
-    // Harita görüntüsünü PDF'ye dönüştür
     html2pdf()
       .from(mapContainer)
       .set(opt)
       .toPdf()
       .get('pdf')
       .then((pdf) => {
-        var totalPages = pdf.internal.getNumberOfPages()
-        pdf.setFontSize(10) // Yazı font boyutunu ayarlayın
+        const pageWidth = pdf.internal.pageSize.width
+        const pageHeight = pdf.internal.pageSize.height
 
-        // Yazıyı PDF'in altına düzgün şekilde ekleyin
-        const text = `
-          Harita Altındaki Rapor:
-          Bu PDF, harita görüntüsünün altına eklenen bir rapordur.
-          Harita üzerinde belirtilen konumlar ve önemli veriler raporlanmıştır.
-            Bu PDF, harita görüntüsünün altına eklenen bir rapordur.
-          Harita üzerinde belirtilen konumlar ve önemli veriler raporlanmıştır.
-            Bu PDF, harita görüntüsünün altına eklenen bir rapordur.
-          Harita üzerinde belirtilen konumlar ve önemli veriler raporlanmıştır.
-            Bu PDF, harita görüntüsünün altına eklenen bir rapordur.
-          Harita üzerinde belirtilen konumlar ve önemli veriler raporlanmıştır.
+        pdf.setFontSize(8)
 
-          Yazı ve resimler uyumlu ve düzgün bir şekilde yerleştirilmiştir.`
+        let text = ''
 
-        // Yazıyı eklerken, maxWidth ile düzgün bir biçim sağlanır ve sayfa sonunda düzgün bir şekilde metin eklenir.
-        pdf.text(text, 0.1, pdf.internal.pageSize.height - 4, { maxWidth: 5 }) // Alt boşluk 1.5 inç
+        analysisStore.recommendedLocations.forEach((location, index) => {
+          text += `Konum ${index + 1}:\n`
+          text += `Latitude: ${location.location.latitude}\n`
+          text += `Longitude: ${location.location.longitude}\n`
+          text += `Elektrik istasyonuna en yakin mesafe: ${location.min_distance_to_existing_station} km \n`
+          text += 'Yakin cevre detaylari:\n'
+          text += `  - Otopark alanlari: ${location.nearby_details.parking_areas}\n`
+          text += `  - Yollar: ${location.nearby_details.paths}\n`
+          text += `- Petrol İstasyonlari: ${location.nearby_details.petrol_stations}\n`
+          text += `  - Trafik Isiklari: ${location.nearby_details.traffic_lights}\n`
+          text += `Konum Skoru: ${location.score}\n\n`
+        })
 
-        // PDF'i kaydedin
+        const yOffset = pageHeight - 4.2
+        pdf.text(text, 0.1, yOffset, { maxWidth: pageWidth - 0.2 })
+
+        const currentDate = new Date().toLocaleDateString('tr-TR')
+        pdf.setFontSize(8)
+
+        pdf.text(
+          `Rapor Tarihi: ${currentDate}`,
+          pageWidth - 0.5,
+          pageHeight - 0.5,
+          { align: 'right' }
+        )
+
         pdf.save('map_screenshot_with_text.pdf')
       })
   } catch (error) {
