@@ -53,6 +53,8 @@ Bu rapor, belirli bir alandaki elektrik istasyonları için potansiyel yerlerin 
 
 ![final-project](https://github.com/user-attachments/assets/16a07417-3489-48cd-b48a-5c1c0e78e5e5)
 ![map](https://github.com/user-attachments/assets/4b47d2cd-6183-4744-bbda-0fe30aec0fb0)
+![trafikIsıkları-yol](https://github.com/user-attachments/assets/e46db48e-48d0-49dc-bc99-a0ffd06a1182)
+![otopark-sarjIstasyon-petrolOfisi](https://github.com/user-attachments/assets/1d7f1082-8c2b-4f48-bacf-b59fbc336e8c)
 
 ---
 
