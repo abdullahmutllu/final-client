@@ -174,11 +174,6 @@ const filterStore = useFilterStore()
 const trafficLightsStore = useTrafficLightsStore()
 const petrolStationStore = usePetrolStationStore()
 const analysisStore = useAnalysisStore()
-analysisStore.recommendedLocations.forEach((location) => {
-  console.log('test', location)
-  console.log('Location Latitude:', location.location.latitude)
-  console.log('Location Longitude:', location.location.longitude)
-})
 
 // Map state
 const zoom = ref(6)

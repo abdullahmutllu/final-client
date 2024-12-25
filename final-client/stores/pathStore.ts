@@ -1,31 +1,13 @@
 import { defineStore } from 'pinia'
 import { transform } from 'ol/proj'
-import { LineString } from 'ol/geom'
-
-interface PathInfo {
-  id: string | null
-  toll?: string | null
-  surface?: string | null
-  ref?: string | null
-  oneway?: string | null
-  name?: string | null
-  maxSpeed?: string | null
-  lanes?: string | null
-  intRef?: string | null
-  highway?: string | null
-  description?: string | null
-  destination?: string | null
-  altName?: string | null
-  coordinates: [number, number][] | null
-  Centroid?: string
-}
+import { PathInfo } from '~/types/path'
 
 export const usePathStore = defineStore('pathStore', {
   state: () => ({
     paths: [] as PathInfo[],
     isLoading: false,
     error: null as string | null,
-    cacheTimestamp: 0, // Önbellek için timestamp
+    cacheTimestamp: 0, 
   }),
 
   getters: {
