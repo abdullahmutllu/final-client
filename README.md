@@ -43,9 +43,16 @@ Kullanıcılar, "Rapor Oluştur" butonuna tıkladığında, haritanın ekran gö
 
 ### Kullanım
 
+
 1. Harita üzerinde en iyi elektrik istasyonu kurulacak üç nokta **Skor**'a göre sıralanır.
 2. Her bir konum için belirtilen veriler toplanır.
 3. Rapor butonuna tıklanarak, harita görüntüsü ve konum detayları içeren bir PDF raporu oluşturulur.
+![h1](https://github.com/user-attachments/assets/dfbd4510-b05d-4866-8d7d-5879d1ad1dcd)
+![h2](https://github.com/user-attachments/assets/2c229343-d733-4ac8-91c4-1f16b3f11389)
+![h3](https://github.com/user-attachments/assets/526f4508-21cc-484f-933b-dea39fa316d1)
+![h4](https://github.com/user-attachments/assets/133a424f-747f-4771-b282-8c7a16503fbb)
+![h5](https://github.com/user-attachments/assets/a7c18ded-8f4b-4b3e-9f69-6d7bf9b7fa25)
+![h6](https://github.com/user-attachments/assets/450be354-d791-4ea0-af1d-7357a988a547)
 
 ---
 
