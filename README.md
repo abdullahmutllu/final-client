@@ -46,111 +46,106 @@ Kullanıcılar, "Rapor Oluştur" butonuna tıkladığında, haritanın ekran gö
 
 1. Harita üzerinde en iyi elektrik istasyonu kurulacak üç nokta **Skor**'a göre sıralanır.
 2. Her bir konum için belirtilen veriler toplanır.
-📊 Veri Toplama ve Yönetimi
-Bu projede coğrafi verilerin toplanması ve yönetimi için PostgreSQL veritabanı ve PostGIS eklentisi kullanılmaktadır. Aşağıdaki veri türleri veritabanında saklanmaktadır:
+## 📦 Veri Toplama ve Yönetimi
 
-📍 Mevcut şarj istasyonlarının konum verileri
+Bu projede coğrafi verilerin toplanması ve yönetimi için **PostgreSQL** veritabanı ve **PostGIS** eklentisi kullanılmaktadır.
 
-⛽ Petrol istasyonları
+Veritabanında aşağıdaki türde veriler saklanmaktadır:
 
-🅿️ Park alanları
+- 📍 Mevcut şarj istasyonlarının konum verileri  
+- ⛽ Petrol istasyonları  
+- 🅿️ Park alanları  
+- 🛣️ Yol ağları ve kavşaklar  
+- 🚦 Trafik lambaları  
 
-🛣️ Yol ağları ve kavşaklar
+Bu veriler, **JSON** formatında **.NET Core API** aracılığıyla frontend uygulamasına iletilmektedir.
 
-🚦 Trafik lambaları
+---
 
-Bu veriler JSON formatında .NET Core API aracılığıyla frontend'e iletilmektedir.
+## 🤖 Makine Öğrenmesi Modelleri
 
-🤖 Makine Öğrenmesi Modelleri
-1️⃣ Regresyon Modelleri
-Şarj istasyonu yerleştirme problemini çözmek için aşağıdaki regresyon modelleri karşılaştırılmıştır:
+Şarj istasyonu yerleştirme problemini çözmek amacıyla çeşitli makine öğrenmesi modelleri kullanılmıştır.
 
-Random Forest Regressor
+### 1️⃣ Regresyon Modelleri
 
-150 ağaçlı yapı
+Konum uygunluğunu puanlamak için aşağıdaki üç regresyon modeli karşılaştırılmıştır:
 
-random_state=42 parametresi ile
+- **Random Forest Regressor**  
+  - 150 ağaçlı yapı  
+  - `random_state=42` parametresi ile
 
-Gradient Boosting Regressor
+- **Gradient Boosting Regressor**  
+  - 100 ağaçlı yapı
 
-100 ağaçlı yapı
+- **MLP Regressor (Multi-Layer Perceptron)**  
+  - Gizli katman boyutları: `(50, 50)`
 
-MLP Regressor (Yapay Sinir Ağı)
+📊 Her modelin performansı şu metriklerle değerlendirilmiştir:
 
-Gizli katman boyutları: (50, 50)
+- MSE (Mean Squared Error)  
+- RMSE (Root Mean Squared Error)  
+- MAE (Mean Absolute Error)  
+- R² (R-squared)
 
-📌 Her modelin performansı şu metriklerle değerlendirilmiştir:
+> Modeller, verilerin %80’i ile eğitilmiş ve %20’si ile test edilmiştir.
 
-MSE (Ortalama Kare Hata)
+---
 
-RMSE (Karekök Ortalama Kare Hata)
+### 2️⃣ Kümeleme Modelleri
 
-MAE (Ortalama Mutlak Hata)
+İstasyon yerleşimi için aday konumların gruplandırılmasında kullanılan algoritmalar:
 
-R² (Determinasyon Katsayısı)
+- **K-Means**  
+  - Optimal küme sayısı, "elbow method" ile belirlenmiştir
 
-🧪 Eğitim/Test oranı: %80 / %20
+- **DBSCAN (Density-Based Spatial Clustering)**  
+  - Parametreler: `eps=0.5`, `min_samples=3`
 
-2️⃣ Kümeleme Modelleri
-Aday konumların gruplandırılmasında aşağıdaki kümeleme algoritmaları kullanılmıştır:
+📈 Değerlendirme kriterleri:
 
-K-Means
+- Silhouette Skoru  
+- Calinski-Harabasz İndeksi
 
-Optimal küme sayısı "elbow" metodu ile belirlenir
+> Daha yüksek **Silhouette skoru** veren model tercih edilmiştir.
 
-DBSCAN
+---
 
-eps=0.5, min_samples=3
+## ⚙️ Özellik Mühendisliği (Feature Engineering)
 
-📌 Değerlendirme Metrikleri:
+Konumların değerlendirilmesi için çıkarılan öznitelikler:
 
-Silhouette Skoru
+- `nearby_paths_count`: Belirli yarıçap içindeki yol sayısı  
+- `nearby_traffic_lights_count`: Yakındaki trafik ışıklarının sayısı  
+- `nearby_petrol_stations_count`: Yakındaki benzin istasyonlarının sayısı  
+- `nearby_parking_count`: Yakındaki park alanlarının sayısı  
+- `min_existing_distance`: En yakın mevcut şarj istasyonuna olan mesafe  
+- `avg_path_dist`: Yakındaki yollara ortalama mesafe  
+- `avg_traffic_dist`: Yakındaki trafik ışıklarına ortalama mesafe  
+- `avg_petrol_dist`: Yakındaki benzin istasyonlarına ortalama mesafe  
+- `avg_parking_dist`: Yakındaki park alanlarına ortalama mesafe  
+- `latitude`: Enlem bilgisi  
+- `longitude`: Boylam bilgisi  
+- `path_density`: Yol yoğunluğu (belirli bir alandaki)  
+- `accessibility_score`: Erişilebilirlik skoru (ana yollar, trafik ışıkları, parklar ve benzin istasyonlarına yakınlığa göre)  
+- `population_density`: Tahmini nüfus yoğunluğu
 
-Calinski-Harabasz İndeksi
+📐 Tüm özellikler **StandardScaler** ve **MinMaxScaler** kullanılarak ölçeklendirilmiştir.
 
-Silhouette değeri daha yüksek olan model tercih edilir.
+---
 
-🛠️ Özellik Mühendisliği
-Konum değerlendirmesi için çıkarılan özellikler:
+## 📍 Coğrafi Analiz Teknikleri
 
-nearby_paths_count: Belirli yarıçap içindeki yol sayısı
+Konumların analizinde kullanılan teknikler şunlardır:
 
-nearby_traffic_lights_count: Yakındaki trafik ışıkları sayısı
+- **Voronoi Diyagramları**  
+  - Mevcut istasyonların etki alanlarını belirlemede
 
-nearby_petrol_stations_count: Yakındaki benzin istasyonları sayısı
+- **Delaunay Üçgenlemesi**  
+  - Şarj istasyonları arasındaki ilişkileri modellemede
 
-nearby_parking_count: Yakındaki park alanları sayısı
+- **Haversine Mesafe Hesaplamaları**  
+  - Gerçek dünya koordinatları arasındaki mesafeleri hesaplamada
 
-min_existing_distance: En yakın mevcut istasyona mesafe
-
-avg_path_dist: Yakındaki yollara ortalama mesafe
-
-avg_traffic_dist: Yakındaki trafik ışıklarına ortalama mesafe
-
-avg_petrol_dist: Yakındaki petrol istasyonlarına ortalama mesafe
-
-avg_parking_dist: Yakındaki park alanlarına ortalama mesafe
-
-latitude: Enlem
-
-longitude: Boylam
-
-path_density: Yol yoğunluğu
-
-accessibility_score: Erişilebilirlik skoru (yakınlık esas alınarak)
-
-population_density: Tahmini nüfus yoğunluğu
-
-📏 Özellikler StandardScaler ve MinMaxScaler ile ölçeklendirilmiştir.
-
-📈 Analiz Teknikleri
-Konum analizinde kullanılan teknikler:
-
-Voronoi Diyagramları: Mevcut şarj istasyonlarının etki alanlarını belirlemede
-
-Delaunay Üçgenlemesi: İstasyonlar arasındaki ilişkileri modellemede
-
-Haversine Mesafesi: Coğrafi koordinatlar arası gerçek mesafeleri hesaplamada
 ![h1](https://github.com/user-attachments/assets/dfbd4510-b05d-4866-8d7d-5879d1ad1dcd)
 ![h2](https://github.com/user-attachments/assets/2c229343-d733-4ac8-91c4-1f16b3f11389)
 ![h3](https://github.com/user-attachments/assets/526f4508-21cc-484f-933b-dea39fa316d1)
