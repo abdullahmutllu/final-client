@@ -46,7 +46,111 @@ Kullanıcılar, "Rapor Oluştur" butonuna tıkladığında, haritanın ekran gö
 
 1. Harita üzerinde en iyi elektrik istasyonu kurulacak üç nokta **Skor**'a göre sıralanır.
 2. Her bir konum için belirtilen veriler toplanır.
-3. Rapor butonuna tıklanarak, harita görüntüsü ve konum detayları içeren bir PDF raporu oluşturulur.
+📊 Veri Toplama ve Yönetimi
+Bu projede coğrafi verilerin toplanması ve yönetimi için PostgreSQL veritabanı ve PostGIS eklentisi kullanılmaktadır. Aşağıdaki veri türleri veritabanında saklanmaktadır:
+
+📍 Mevcut şarj istasyonlarının konum verileri
+
+⛽ Petrol istasyonları
+
+🅿️ Park alanları
+
+🛣️ Yol ağları ve kavşaklar
+
+🚦 Trafik lambaları
+
+Bu veriler JSON formatında .NET Core API aracılığıyla frontend'e iletilmektedir.
+
+🤖 Makine Öğrenmesi Modelleri
+1️⃣ Regresyon Modelleri
+Şarj istasyonu yerleştirme problemini çözmek için aşağıdaki regresyon modelleri karşılaştırılmıştır:
+
+Random Forest Regressor
+
+150 ağaçlı yapı
+
+random_state=42 parametresi ile
+
+Gradient Boosting Regressor
+
+100 ağaçlı yapı
+
+MLP Regressor (Yapay Sinir Ağı)
+
+Gizli katman boyutları: (50, 50)
+
+📌 Her modelin performansı şu metriklerle değerlendirilmiştir:
+
+MSE (Ortalama Kare Hata)
+
+RMSE (Karekök Ortalama Kare Hata)
+
+MAE (Ortalama Mutlak Hata)
+
+R² (Determinasyon Katsayısı)
+
+🧪 Eğitim/Test oranı: %80 / %20
+
+2️⃣ Kümeleme Modelleri
+Aday konumların gruplandırılmasında aşağıdaki kümeleme algoritmaları kullanılmıştır:
+
+K-Means
+
+Optimal küme sayısı "elbow" metodu ile belirlenir
+
+DBSCAN
+
+eps=0.5, min_samples=3
+
+📌 Değerlendirme Metrikleri:
+
+Silhouette Skoru
+
+Calinski-Harabasz İndeksi
+
+Silhouette değeri daha yüksek olan model tercih edilir.
+
+🛠️ Özellik Mühendisliği
+Konum değerlendirmesi için çıkarılan özellikler:
+
+nearby_paths_count: Belirli yarıçap içindeki yol sayısı
+
+nearby_traffic_lights_count: Yakındaki trafik ışıkları sayısı
+
+nearby_petrol_stations_count: Yakındaki benzin istasyonları sayısı
+
+nearby_parking_count: Yakındaki park alanları sayısı
+
+min_existing_distance: En yakın mevcut istasyona mesafe
+
+avg_path_dist: Yakındaki yollara ortalama mesafe
+
+avg_traffic_dist: Yakındaki trafik ışıklarına ortalama mesafe
+
+avg_petrol_dist: Yakındaki petrol istasyonlarına ortalama mesafe
+
+avg_parking_dist: Yakındaki park alanlarına ortalama mesafe
+
+latitude: Enlem
+
+longitude: Boylam
+
+path_density: Yol yoğunluğu
+
+accessibility_score: Erişilebilirlik skoru (yakınlık esas alınarak)
+
+population_density: Tahmini nüfus yoğunluğu
+
+📏 Özellikler StandardScaler ve MinMaxScaler ile ölçeklendirilmiştir.
+
+📈 Analiz Teknikleri
+Konum analizinde kullanılan teknikler:
+
+Voronoi Diyagramları: Mevcut şarj istasyonlarının etki alanlarını belirlemede
+
+Delaunay Üçgenlemesi: İstasyonlar arasındaki ilişkileri modellemede
+
+Haversine Mesafesi: Coğrafi koordinatlar arası gerçek mesafeleri hesaplamada
 ![h1](https://github.com/user-attachments/assets/dfbd4510-b05d-4866-8d7d-5879d1ad1dcd)
 ![h2](https://github.com/user-attachments/assets/2c229343-d733-4ac8-91c4-1f16b3f11389)
 ![h3](https://github.com/user-attachments/assets/526f4508-21cc-484f-933b-dea39fa316d1)
